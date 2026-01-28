@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ML Prediction Frame | Churn Predictor Pro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+    }
+
+    .frame {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(12px);
+      border-radius: 25px;
+      padding: 30px;
+      width: 95%;
+      max-width: 900px;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 25px;
+      color: #00e5ff;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      font-size: 0.8rem;
+      margin-bottom: 6px;
+      opacity: 0.9;
+    }
+
+    input, select {
+      padding: 12px;
+      border-radius: 12px;
+      border: none;
+      outline: none;
+      font-size: 0.9rem;
+      background: rgba(255, 255, 255, 0.95);
+      color: #333;
+    }
+
+    .full {
+      grid-column: span 3;
+    }
+
+    button {
+      padding: 16px;
+      border-radius: 18px;
+      border: none;
+      background: linear-gradient(135deg, #00e5ff, #00ff87);
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 1px;
+      box-shadow: 0 10px 25px rgba(0, 255, 135, 0.6);
+      transition: transform 0.2s ease;
+    }
+
+    button:hover {
+      transform: translateY(-3px);
+    }
+
+    .output {
+      margin-top: 25px;
+      padding: 20px;
+      border-radius: 18px;
+      display: none;
+      text-align: center;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .high {
+      background: rgba(255, 0, 0, 0.3);
+      color: #ffd6d6;
+    }
+
+    .low {
+      background: rgba(0, 255, 135, 0.3);
+      color: #ccffee;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 0.7rem;
+      opacity: 0.7;
+    }
+
+    @media (max-width: 768px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .full {
+        grid-column: span 1;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="frame">
+    <h1>🔮 Customer Churn Prediction Frame</h1>
+
+    <div class="grid">
+      <div class="form-group">
+        <label>Contract Type</label>
+        <select id="contract">
+          <option>Month-to-month</option>
+          <option>One year</option>
+          <option>Two year</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Internet Service</label>
+        <select id="internet">
+          <option>Fiber optic</option>
+          <option>DSL</option>
+          <option>No</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Tech Support</label>
+        <select id="tech">
+          <option>Yes</option>
+          <option>No</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Streaming Services</label>
+        <select id="streaming">
+          <option>Yes</option>
+          <option>No</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Tenure (Months)</label>
+        <input type="number" id="tenure" placeholder="e.g. 12">
+      </div>
+
+      <div class="form-group">
+        <label>Monthly Charges (₹)</label>
+        <input type="number" id="monthly" placeholder="e.g. 799">
+      </div>
+
+      <div class="form-group">
+        <label>Payment Method</label>
+        <select id="payment">
+          <option>Electronic check</option>
+          <option>Credit card</option>
+          <option>Bank transfer</option>
+          <option>Mailed check</option>
+        </select>
+      </div>
+
+      <div class="form-group full">
+        <button onclick="runModel()">🚀 Run ML Model</button>
+      </div>
+    </div>
+
+    <div id="output" class="output"></div>
+
+    <footer>
+      Churn Predictor Pro | AI ML Engine
+    </footer>
+  </div>
+
+  <script>
+    async function runModel() {
+      const data = {
+        contract: document.getElementById("contract").value,
+        internet: document.getElementById("internet").value,
+        tech: document.getElementById("tech").value,
+        streaming: document.getElementById("streaming").value,
+        tenure: Number(document.getElementById("tenure").value),
+        monthly: Number(document.getElementById("monthly").value),
+        payment: document.getElementById("payment").value
+      };
+
+      const output = document.getElementById("output");
+
+      if (!data.tenure || !data.monthly) {
+        output.style.display = "block";
+        output.className = "output high";
+        output.innerText = "⚠️ Please fill all numeric fields!";
+        return;
+      }
+
+      try {
+        const response = await fetch("http://127.0.0.1:5000/predict", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        output.style.display = "block";
+        output.className = result.risk === "HIGH" ? "output high" : "output low";
+        output.innerText =
+          `Prediction: ${result.prediction}
+Risk Level: ${result.risk}
+Probability: ${result.probability}`;
+      } catch (err) {
+        output.style.display = "block";
+        output.className = "output high";
+        output.innerText = "❌ Backend not running. Please start Python server.";
+      }
+    }
+  </script>
+
+</body>
+</html>
